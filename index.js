@@ -1,31 +1,34 @@
-const express= require('express');
-const connectDB = require('./Connections/dbconnection')
+ // index.js or server.js
+const express = require('express');
+const connectDB = require('./Connections/dbconnection');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
+require('dotenv').config(); // Add this
 
 const app = express();
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 
 app.use(cors({
-    origin: 'http://localhost:3000', // Replace with your frontend URL
-    credentials: true, // Allow cookies to be sent
+  origin: process.env.CLIENT_URL,
+  credentials: true,
 }));
- 
 
-const cookieParser = require('cookie-parser');
 app.use(cookieParser());
- app.use(express.json())
+app.use(express.json());
+
+// Connect to DB
 connectDB();
 
-
+// Routes
 const AuthRoutes = require('./Routes/user');
 const VideoRoutes = require('./Routes/video');
 const CommentRoutes = require('./Routes/comment');
 
-app.use('/api',VideoRoutes)
-app.use('/auth',AuthRoutes)
-app.use('/commentapi',CommentRoutes)
+app.use('/api', VideoRoutes);
+app.use('/auth', AuthRoutes);
+app.use('/commentapi', CommentRoutes);
 
-
-app.listen(PORT,()=>{
-    console.log(`Server is running on port ${PORT}`)
-})
+// Start server
+app.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
+});

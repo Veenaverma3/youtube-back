@@ -55,7 +55,7 @@ exports.signUp = async (req, res) => {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const token = jwt.sign({ userId: user._id }, 'Its_My_Secret_Key');
+    const token = jwt.sign({ userId: user._id }, 'veena');
     res.cookie('token', token, cookieOptions);
 
     res.json({

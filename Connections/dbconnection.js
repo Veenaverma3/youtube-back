@@ -1,8 +1,13 @@
- const mongoose = require('mongoose');
+ // Connections/dbconnection.js
+const mongoose = require('mongoose');
+require('dotenv').config(); // Add this
 
 const connectDB = async () => {
   try {
-    await mongoose.connect('mongodb://localhost:27017/youtubebackend');
+    await mongoose.connect(process.env.MONGO_URI, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
 
     console.log('✅ MongoDB Connected');
   } catch (err) {
