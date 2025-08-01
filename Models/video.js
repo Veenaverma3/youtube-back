@@ -25,14 +25,18 @@ const videoSchema = new mongoose.Schema({
         type: String,
         default:"All"
     },
-     likes: {
-        type: Number,
-        default: 0,
-    },
-    dislikes: {
-        type: Number,
-        default: 0,
+   likes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
     }
+  ],
+     dislikes: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "user",
+    }
+  ],
 }, { timestamps: true });
 
 module.exports = mongoose.model('video', videoSchema);
