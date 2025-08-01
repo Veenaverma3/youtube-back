@@ -5,58 +5,56 @@ const jwt = require("jsonwebtoken");
 const cookieOptions = {
   httpOnly: true,
   secure: false,
-  sameSite:'Lax'
-}
+  sameSite: "Lax",
+};
 
+// ───────────── Signup ─────────────
 exports.signUp = async (req, res) => {
   try {
     const { channelName, userName, password, about, profilePic } = req.body;
-    console.log(channelName);
     const isExist = await User.findOne({ userName });
+
     if (isExist) {
-      res.status(400).json({ error: "User already exists" });
-    } else {
-      const updatedPass = await bcrypt.hash(password, 10);
-      const user = new User({
-        channelName,
-        userName,
-        password: updatedPass,
-        about,
-        profilePic,
-      });
-      await user.save();
-      console.log("first", user);
-      res
-        .status(201)
-        .json({
-          message: "user registered successful",
-          success: true,
-          user,
-        });
+      return res.status(400).json({ error: "User already exists" });
     }
-  }  catch (error) {
-  console.error("Signup Error:", error);
-  res.status(500).json({ error: "Server error during signup" });
-}
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user = new User({
+      channelName,
+      userName,
+      password: hashedPassword,
+      about,
+      profilePic,
+    });
+
+    await user.save();
+
+    res.status(201).json({
+      message: "User registered successfully",
+      success: true,
+      user,
+    });
+  } catch (error) {
+    console.error("Signup Error:", error);
+    res.status(500).json({ error: "Server error during signup" });
+  }
 };
 
- 
- exports.signIn = async (req, res) => {
+// ───────────── Login / SignIn ─────────────
+exports.signIn = async (req, res) => {
   try {
     const { userName, password } = req.body;
     const user = await User.findOne({ userName });
 
-    if (!user) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(400).json({ error: "Invalid credentials" });
     }
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ error: "Invalid credentials" });
-    }
+    const token = jwt.sign({ userId: user._id }, 'veena', {
+      expiresIn: "90d",
+    });
 
-    const token = jwt.sign({ userId: user._id }, 'veena');
-    res.cookie('token', token, cookieOptions);
+    res.cookie("token", token, cookieOptions);
 
     res.json({
       message: "Logged in successfully",
@@ -75,16 +73,27 @@ exports.signUp = async (req, res) => {
   }
 };
 
+// ───────────── Logout ─────────────
 exports.logout = async (req, res) => {
-  res.clearCookie('token', cookieOptions).json({ message: 'logged out successfully'})
-}
+  res.clearCookie("token", cookieOptions).json({ message: "Logged out successfully" });
+};
 
- // userController.js
+// ───────────── Get Current User ─────────────
 exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password"); // use req.user._id instead of req.userId
+    const user = await User.findById(req.user._id).select("-password");
     res.status(200).json({ user });
   } catch (error) {
     res.status(500).json({ message: "Error getting user" });
+  }
+};
+
+// ───────────── Get All Users ─────────────
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({}).select("channelName profilePic");
+    res.status(200).json({ users });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch users" });
   }
 };

@@ -1,20 +1,22 @@
- // index.js or server.js
 const express = require('express');
-const connectDB = require('./Connections/dbconnection');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
-require('dotenv').config(); // Add this
+ const connectDB = require('./Connections/dbconnection');
+ const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 4000;
 
-app.use(cors({
-  origin: process.env.CLIENT_URL,
+// Constants
+const CLIENT_URL = process.env.CLIENT_URL;
+
+// Middleware
+ app.use(cors({
+  origin: CLIENT_URL,
   credentials: true,
-}));
-
-app.use(cookieParser());
-app.use(express.json());
+  }));
+  app.use(cookieParser());
+ app.use(express.json());
 
 // Connect to DB
 connectDB();
@@ -28,7 +30,9 @@ app.use('/api', VideoRoutes);
 app.use('/auth', AuthRoutes);
 app.use('/commentapi', CommentRoutes);
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+const port = process.env.PORT;
+// Start the server
+app.listen(port, () => {
+  console.log(`🚀 Server is running on port http://localhost:${port}`);
 });
+ 

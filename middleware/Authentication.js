@@ -1,29 +1,19 @@
- // middleware/Authentication.js
-const jwt = require('jsonwebtoken');
-const User = require('../Models/user');
+ const jwt = require('jsonwebtoken');
 
 const auth = async (req, res, next) => {
-  const token = req.cookies.token;
-
-  console.log("🔐 Received token from cookies:", token);
+  const token = req.cookies.token; // 🔥 Must come from cookies
+  console.log("Received token from cookies:", token);
 
   if (!token) {
-    return res.status(401).json({ error: "No token, authentication denied" });
+    return res.status(401).json({ message: "No token, authentication denied" });
   }
 
   try {
-    const decoded = jwt.verify(token, "Its_My_Secret_Key");
-
-    const user = await User.findById(decoded.userId).select("-password");
-    if (!user) {
-      return res.status(401).json({ error: "User not found" });
-    }
-
-    req.user = user; // ✅ this is important
+    const decoded = jwt.verify(token, 'veena'); // use your secret
+    req.user = decoded;
     next();
-  } catch (err) {
-    console.error("❌ Error verifying token:", err);
-    res.status(401).json({ error: "Token is not valid" });
+  } catch (error) {
+    return res.status(401).json({ message: "Token is not valid" });
   }
 };
 
