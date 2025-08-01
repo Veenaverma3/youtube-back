@@ -10,7 +10,7 @@ exports.uploadVideo = async (req, res) => {
     console.log("req.user =>", req.user);
         console.log(req.user)
         
-    const videoUpload = new Video({
+    const videoUpload = new video({
       user: req.user._id,
       title,
       description,
@@ -32,7 +32,7 @@ exports.uploadVideo = async (req, res) => {
 //  get all video like home page video 
 exports.getAllVideos = async (req, res) => {
     try {
-        const videos = await Video.find().populate('user', 'channelName profilePic userName createdAt');
+        const videos = await video.find().populate('user', 'channelName profilePic userName createdAt');
         res.status(200).json(videos);
     } catch (error) {
         console.error("Get Videos Error:", error);
@@ -44,7 +44,7 @@ exports.getAllVideos = async (req, res) => {
 exports.getVideoById = async (req, res) => {
      try {
         const {id} = req.params;
-        const video = await Video.findById(id).populate('user', 'channelName profilePic userName createdAt');
+        const video = await video.findById(id).populate('user', 'channelName profilePic userName createdAt');
         video.likesCount = video.likes.length;
         res.status(200).json({ success: true, video })
      } catch (error) {
@@ -91,7 +91,7 @@ exports.deleteVideo = async (req, res) => {
     const videoId = req.params.id;
     const userId = req.userId; // from Authentication middleware
 
-    const video = await Video.findById(videoId);
+    const video = await video.findById(videoId);
 
     if (!video) {
       return res.status(404).json({ error: "Video not found" });
@@ -111,7 +111,7 @@ exports.deleteVideo = async (req, res) => {
 
 exports.likeVideo = async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id);
+    const video = await video.findById(req.params.id);
     if (!video) return res.status(404).json({ message: "Video not found" });
 
     if (!video.likes.includes(req.user._id)) {
@@ -131,7 +131,7 @@ exports.likeVideo = async (req, res) => {
 
 exports.dislikeVideo = async (req, res) => {
   try {
-    const video = await Video.findById(req.params.id);
+    const video = await video.findById(req.params.id);
     if (!video) return res.status(404).json({ message: "Video not found" });
 
     if (!video.dislikes.includes(req.user._id)) {
