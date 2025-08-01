@@ -8,11 +8,10 @@ dotenv.config();
 const app = express();
 
 // Constants
-const CLIENT_URL = process.env.CLIENT_URL;
-
+ const CLIENT_URL = 'https://youtube-fron.vercel.app';
 // Middleware
  app.use(cors({
-  origin: 'https://youtube-fron.vercel.app',
+  origin: CLIENT_URL,
   credentials: true,
   }));
   app.use(cookieParser());
