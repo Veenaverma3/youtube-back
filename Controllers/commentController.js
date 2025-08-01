@@ -23,7 +23,8 @@ module.exports.getCommentsByVideoId = async (req, res) => {
 
     const comments = await Comment.find({ video: videoId })
       .populate('user', 'channelName userName profilePic createdAt')
- 
+      .sort({ createdAt: -1 }); // latest comments first
+
     res.status(200).json({
       message: "Comments fetched successfully",
       comments,

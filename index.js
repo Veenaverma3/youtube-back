@@ -14,8 +14,8 @@ const app = express();
   origin: CLIENT_URL,
   credentials: true,
   }));
+  app.use(express.json());
   app.use(cookieParser());
- app.use(express.json());
 
 // Connect to DB
 connectDB();

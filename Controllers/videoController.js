@@ -1,4 +1,4 @@
-const video = require('../Models/video');
+const Video = require('../Models/video');
 
 //  upload video
 exports.uploadVideo = async (req, res) => {
@@ -10,7 +10,7 @@ exports.uploadVideo = async (req, res) => {
     console.log("req.user =>", req.user);
         console.log(req.user)
         
-    const videoUpload = new video({
+    const videoUpload = new Video({
       user: req.user._id,
       title,
       description,
@@ -32,7 +32,7 @@ exports.uploadVideo = async (req, res) => {
 //  get all video like home page video 
 exports.getAllVideos = async (req, res) => {
     try {
-        const videos = await video.find().populate('user', 'channelName profilePic userName createdAt');
+        const videos = await Video.find().populate('user', 'channelName profilePic userName createdAt');
         res.status(200).json(videos);
     } catch (error) {
         console.error("Get Videos Error:", error);
@@ -41,43 +41,16 @@ exports.getAllVideos = async (req, res) => {
 }
 
 // get video by id when we click on video in home page 
- exports.getVideoById = async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const video = await Video.findById(id)
-      .populate('user', 'channelName profilePic userName createdAt');
-
-    if (!video) {
-      return res.status(404).json({ error: "Video not found" });
+exports.getVideoById = async (req, res) => {
+     try {
+        const {id} = req.params;
+        const video = await Video.findById(id).populate('user', 'channelName profilePic userName createdAt');
+        
+        res.status(200).json({ success: true, video })
+     } catch (error) {
+         res.status(500).json({ error: "Server error while fetching video" });
     }
-
-    let isLiked = false;
-    let isDisliked = false;
-
-    // Optional chaining to avoid crash
-    if (req?.user?._id) {
-      const userId = req.user._id.toString();
-      isLiked = video.likes.some(like => like.toString() === userId);
-      isDisliked = video.dislikes.some(dislike => dislike.toString() === userId);
-    }
-
-    res.status(200).json({
-      success: true,
-      video: {
-        ...video.toObject(),
-        likesCount: video.likes.length,
-        dislikesCount: video.dislikes.length,
-        isLiked,
-        isDisliked,
-      },
-    });
-
-  } catch (error) {
-    console.error("Error in getVideoById:", error);
-    res.status(500).json({ error: "Server error while fetching video" });
-  }
-};
+} 
 
 // see particular user's videos
   const User = require('../Models/user'); // make sure this is imported at the top
@@ -111,14 +84,14 @@ exports.getVideosByUserId = async (req, res) => {
       .json({ error: "Server error while fetching user's videos" });
   }
 };
- 
+
  
 exports.deleteVideo = async (req, res) => {
   try {
     const videoId = req.params.id;
     const userId = req.userId; // from Authentication middleware
 
-    const video = await video.findById(videoId);
+    const video = await Video.findById(videoId);
 
     if (!video) {
       return res.status(404).json({ error: "Video not found" });
@@ -128,50 +101,10 @@ exports.deleteVideo = async (req, res) => {
       return res.status(403).json({ error: "Not authorized to delete this video" });
     }
 
-    await video.remove();
+    await video.deleteOne();
     res.status(200).json({ message: "Video deleted successfully" });
   } catch (error) {
     console.error("Delete video error:", error);
     res.status(500).json({ error: "Server error while deleting video" });
   }
 };
-
-exports.likeVideo = async (req, res) => {
-  try {
-    const video = await video.findById(req.params.id);
-    if (!video) return res.status(404).json({ message: "Video not found" });
-
-    if (!video.likes.includes(req.user._id)) {
-      video.likes.push(req.user._id);
-      // Optional: remove from dislikes
-      video.dislikes = video.dislikes.filter(
-        (id) => id.toString() !== req.user._id.toString()
-      );
-      await video.save();
-    }
-
-    res.status(200).json({ message: "Liked" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-};
-
-exports.dislikeVideo = async (req, res) => {
-  try {
-    const video = await video.findById(req.params.id);
-    if (!video) return res.status(404).json({ message: "Video not found" });
-
-    if (!video.dislikes.includes(req.user._id)) {
-      video.dislikes.push(req.user._id);
-      // Optional: remove from likes
-      video.likes = video.likes.filter(
-        (id) => id.toString() !== req.user._id.toString()
-      );
-      await video.save();
-    }
-
-    res.status(200).json({ message: "Disliked" });
-  } catch (err) {
-    res.status(500).json({ error: "Server error" });
-  }
-}
