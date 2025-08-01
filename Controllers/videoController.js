@@ -41,16 +41,21 @@ exports.getAllVideos = async (req, res) => {
 }
 
 // get video by id when we click on video in home page 
-exports.getVideoById = async (req, res) => {
-     try {
-        const {id} = req.params;
-        const video = await Video.findById(id).populate('user', 'channelName profilePic userName createdAt');
-        
-        res.status(200).json({ success: true, video })
-     } catch (error) {
-         res.status(500).json({ error: "Server error while fetching video" });
-    }
-} 
+ exports.getVideoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!id) return res.status(400).json({ error: "Missing video ID" });
+
+    const video = await Video.findById(id).populate('user', 'channelName profilePic userName createdAt');
+    if (!video) return res.status(404).json({ error: "Video not found" });
+
+    res.status(200).json({ success: true, video });
+  } catch (error) {
+    console.error("Error in getVideoById:", error); // <- log the actual error
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
 
 // see particular user's videos
   const User = require('../Models/user'); // make sure this is imported at the top
