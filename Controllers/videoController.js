@@ -1,4 +1,6 @@
 const Video = require('../Models/video');
+  const User = require('../Models/user'); // make sure this is imported at the top
+const auth = require('../Middleware/auth');
 
 //  upload video
 exports.uploadVideo = async (req, res) => {
@@ -58,7 +60,6 @@ exports.getAllVideos = async (req, res) => {
 
 
 // see particular user's videos
-  const User = require('../Models/user'); // make sure this is imported at the top
 
 exports.getVideosByUserId = async (req, res) => {
   try {
