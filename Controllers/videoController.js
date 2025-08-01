@@ -41,16 +41,43 @@ exports.getAllVideos = async (req, res) => {
 }
 
 // get video by id when we click on video in home page 
-exports.getVideoById = async (req, res) => {
-     try {
-        const {id} = req.params;
-        const video = await video.findById(id).populate('user', 'channelName profilePic userName createdAt');
-        video.likesCount = video.likes.length;
-        res.status(200).json({ success: true, video })
-     } catch (error) {
-         res.status(500).json({ error: "Server error while fetching video" });
-    }  
-} 
+ exports.getVideoById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const video = await Video.findById(id)
+      .populate('user', 'channelName profilePic userName createdAt');
+
+    if (!video) {
+      return res.status(404).json({ error: "Video not found" });
+    }
+
+    let isLiked = false;
+    let isDisliked = false;
+
+    // Optional chaining to avoid crash
+    if (req?.user?._id) {
+      const userId = req.user._id.toString();
+      isLiked = video.likes.some(like => like.toString() === userId);
+      isDisliked = video.dislikes.some(dislike => dislike.toString() === userId);
+    }
+
+    res.status(200).json({
+      success: true,
+      video: {
+        ...video.toObject(),
+        likesCount: video.likes.length,
+        dislikesCount: video.dislikes.length,
+        isLiked,
+        isDisliked,
+      },
+    });
+
+  } catch (error) {
+    console.error("Error in getVideoById:", error);
+    res.status(500).json({ error: "Server error while fetching video" });
+  }
+};
 
 // see particular user's videos
   const User = require('../Models/user'); // make sure this is imported at the top
