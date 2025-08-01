@@ -1,10 +1,10 @@
  const mongoose = require('mongoose');
+ require('dotenv').config();
 
-const MONGO_URI = 'mongodb://localhost:27017/youtubebackend';
-
+const MONGO_URI = process.env.MONGO_URI ; // Replace with your MongoDB URI
 const connectDB = async () => {
   try {
-    await mongoose.connect(MONGO_URI);
+    await mongoose.connect(`${MONGO_URI}`);
     console.log('✅ MongoDB Connected');
   } catch (err) {
     console.error('❌ MongoDB Connection Error:', err.message);
