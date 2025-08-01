@@ -1,6 +1,4 @@
-const Video = require('../Models/video');
-  const User = require('../Models/user'); // make sure this is imported at the top
-const auth = require('../Middleware/auth');
+ const video = require('../Models/video');
 
 //  upload video
 exports.uploadVideo = async (req, res) => {
@@ -12,7 +10,7 @@ exports.uploadVideo = async (req, res) => {
     console.log("req.user =>", req.user);
         console.log(req.user)
         
-    const videoUpload = new Video({
+    const videoUpload = new video({
       user: req.user._id,
       title,
       description,
@@ -34,7 +32,7 @@ exports.uploadVideo = async (req, res) => {
 //  get all video like home page video 
 exports.getAllVideos = async (req, res) => {
     try {
-        const videos = await Video.find().populate('user', 'channelName profilePic userName createdAt');
+        const videos = await video.find().populate('user', 'channelName profilePic userName createdAt');
         res.status(200).json(videos);
     } catch (error) {
         console.error("Get Videos Error:", error);
@@ -44,22 +42,18 @@ exports.getAllVideos = async (req, res) => {
 
 // get video by id when we click on video in home page 
  exports.getVideoById = async (req, res) => {
-  try {
-    const { id } = req.params;
-    if (!id) return res.status(400).json({ error: "Missing video ID" });
-
-    const video = await Video.findById(id).populate('user', 'channelName profilePic userName createdAt');
-    if (!video) return res.status(404).json({ error: "Video not found" });
-
-    res.status(200).json({ success: true, video });
-  } catch (error) {
-    console.error("Error in getVideoById:", error); // <- log the actual error
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
+     try {
+        const {id} = req.params;
+        const video = await video.findById(id).populate('user', 'channelName profilePic userName createdAt');
+        video.likesCount = video.likes.length;
+        res.status(200).json({ success: true, video })
+     } catch (error) {
+         res.status(500).json({ error: "Server error while fetching video" });
+    }
+} 
 
 // see particular user's videos
+  const User = require('../Models/user'); // make sure this is imported at the top
 
 exports.getVideosByUserId = async (req, res) => {
   try {
@@ -75,7 +69,7 @@ exports.getVideosByUserId = async (req, res) => {
     }
 
     // ✅ Then fetch the videos
-    const videos = await Video.find({ user: userId }).populate(
+    const videos = await video.find({ user: userId }).populate(
       'user',
       'channelName profilePic userName createdAt about'
     );
@@ -90,14 +84,14 @@ exports.getVideosByUserId = async (req, res) => {
       .json({ error: "Server error while fetching user's videos" });
   }
 };
-
+ 
  
 exports.deleteVideo = async (req, res) => {
   try {
     const videoId = req.params.id;
     const userId = req.userId; // from Authentication middleware
 
-    const video = await Video.findById(videoId);
+    const video = await video.findById(videoId);
 
     if (!video) {
       return res.status(404).json({ error: "Video not found" });
@@ -107,7 +101,7 @@ exports.deleteVideo = async (req, res) => {
       return res.status(403).json({ error: "Not authorized to delete this video" });
     }
 
-    await video.deleteOne();
+    await video.remove();
     res.status(200).json({ message: "Video deleted successfully" });
   } catch (error) {
     console.error("Delete video error:", error);
