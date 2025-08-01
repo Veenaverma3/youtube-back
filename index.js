@@ -12,7 +12,7 @@ const CLIENT_URL = process.env.CLIENT_URL;
 
 // Middleware
  app.use(cors({
-  origin: '*',
+  origin: 'https://youtube-fron.vercel.app',
   credentials: true,
   }));
   app.use(cookieParser());
