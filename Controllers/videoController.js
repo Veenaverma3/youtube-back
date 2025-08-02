@@ -1,4 +1,6 @@
  const video = require('../Models/video');
+   const User = require('../Models/user'); // make sure this is imported at the top
+
 
 //  upload video
 exports.uploadVideo = async (req, res) => {
@@ -42,20 +44,28 @@ exports.getAllVideos = async (req, res) => {
 
 // get video by id when we click on video in home page 
  exports.getVideoById = async (req, res) => {
-     try {
-         const video = await video.findById(req.params.id).populate('user', 'channelName profilePic userName createdAt');
-         if (!video) {
-             return res.status(404).json({ error: "Video not found" });
-         }
-         res.status(200).json({ video })
-     } catch (error) {
-         console.error("Error in getVideoById:", err);
-         res.status(500).json({ error: "Server error while fetching video" });
+  try {
+    const { id } = req.params; // ✅ extract the id from params
+
+    const foundVideo = await video.findById(id).populate(
+      'user',
+      'channelName profilePic userName createdAt'
+    );
+
+    if (!foundVideo) {
+      return res.status(404).json({ error: "Video not found" });
     }
-} 
+
+    res.status(200).json({ success: true, video: foundVideo });
+
+  } catch (error) {
+    console.error("Get Video By ID Error:", error);
+    res.status(500).json({ error: "Server error while fetching video" });
+  }
+};
+
 
 // see particular user's videos
-  const User = require('../Models/user'); // make sure this is imported at the top
 
 exports.getVideosByUserId = async (req, res) => {
   try {
