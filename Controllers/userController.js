@@ -89,11 +89,13 @@ exports.getCurrentUser = async (req, res) => {
 };
 
 // ───────────── Get All Users ─────────────
-exports.getAllUsers = async (req, res) => {
+ exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.find({}).select("channelName profilePic");
-    res.status(200).json({ users });
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch users" });
+    const users = await User.find({}, "channelName profilePic"); // Equivalent to `.select(...)`
+    res.status(200).json({ success: true, users });
+  } catch (error) {
+    console.error("Error fetching users:", error.message);
+    res.status(500).json({ success: false, message: "Failed to fetch users" });
   }
 };
+
