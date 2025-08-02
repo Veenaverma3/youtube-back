@@ -3,8 +3,8 @@
 // Add a comment to a video
 module.exports.addComment = async (req, res) => {
   try {
-      const { video,user, message } = req.body;
-    const comment = new Comment({ user: req.user._id, video, message });
+      const { videoId, message } = req.body;
+    const comment = new Comment({ user: req.user._id, videoId, message });
     await comment.save();
 
     res.status(201).json({
