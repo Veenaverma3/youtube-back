@@ -1,13 +1,14 @@
  const User = require("../Models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const cookieOptions = {
   httpOnly: true,
-  secure: true,
-  sameSite: "none",
+  secure: false, // set to true in production (HTTPS)
+  sameSite: "Lax",
+  maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
 };
-
 // ───────────── Signup ─────────────
 exports.signUp = async (req, res) => {
   try {
@@ -28,11 +29,21 @@ exports.signUp = async (req, res) => {
     });
 
     await user.save();
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: "90d",
+    });
+       res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
       message: "User registered successfully",
       success: true,
-      user,
+      token,
+      user: {
+        _id: user._id,
+        userName: user.userName,
+        channelName: user.channelName,
+        profilePic: user.profilePic,
+      },
     });
   } catch (error) {
     console.error("Signup Error:", error);
@@ -54,8 +65,8 @@ exports.signIn = async (req, res) => {
       expiresIn: "90d",
     });
 
-    res.cookie("token", token, cookieOptions);
-
+ res.cookie("token", token, cookieOptions);
+ console.log("Token set in cookies:", token);
     res.json({
       message: "Logged in successfully",
       success: true,
