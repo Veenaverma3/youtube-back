@@ -1,5 +1,5 @@
  const jwt = require('jsonwebtoken');
- 
+ require('dotenv').config();
 const auth = async (req, res, next) => {
   const token = req.cookies.token; // 🔥 Must come from cookies
   console.log("Received token from cookies:", token);
@@ -9,7 +9,7 @@ const auth = async (req, res, next) => {
   }
 
   try {
-    const decoded = jwt.verify(token, 'veena'); // use your secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET); // use your secret
     req.user = decoded;
     next();
   } catch (err) {

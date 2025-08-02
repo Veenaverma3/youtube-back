@@ -18,8 +18,10 @@
     });
 
     await comment.save();
-
+    console.log("Comment added:", comment); 
+    
     res.status(201).json({
+      success: true,
       message: "Comment added successfully",
       comment,
     });
