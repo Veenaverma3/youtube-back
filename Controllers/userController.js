@@ -79,23 +79,23 @@ exports.logout = async (req, res) => {
 };
 
 // ───────────── Get Current User ─────────────
-exports.getCurrentUser = async (req, res) => {
-  try {
-    const user = await User.findById(req.user._id).select("-password");
-    res.status(200).json({ user });
-  } catch (error) {
-    res.status(500).json({ message: "Error getting user" });
-  }
-};
+// exports.getCurrentUser = async (req, res) => {
+//   try {
+//     const user = await User.findById(req.user._id).select("-password");
+//     res.status(200).json({ user });
+//   } catch (error) {
+//     res.status(500).json({ message: "Error getting user" });
+//   }
+// };
 
-// ───────────── Get All Users ─────────────
- exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await User.find({}, "channelName profilePic"); // Equivalent to `.select(...)`
-    res.status(200).json({ success: true, users });
-  } catch (error) {
-    console.error("Error fetching users:", error.message);
-    res.status(500).json({ success: false, message: "Failed to fetch users" });
-  }
-};
+// // ───────────── Get All Users ─────────────
+//  exports.getAllUsers = async (req, res) => {
+//   try {
+//     const users = await User.find({}, "channelName profilePic"); // Equivalent to `.select(...)`
+//     res.status(200).json({ success: true, users });
+//   } catch (error) {
+//     console.error("Error fetching users:", error.message);
+//     res.status(500).json({ success: false, message: "Failed to fetch users" });
+//   }
+// };
 
