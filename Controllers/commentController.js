@@ -1,10 +1,22 @@
  const Comment = require('../Models/comment');
 
 // Add a comment to a video
-module.exports.addComment = async (req, res) => {
+ module.exports.addComment = async (req, res) => {
   try {
-      const { videoId, message } = req.body;
-    const comment = new Comment({ user: req.user._id, videoId, message });
+    const { video, message ,userId } = req.body;
+
+        if (!video || !message || !userId) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+
+    const comment = new Comment({
+      user: userId,
+      video,
+      message,
+      // user: req.user?._id  <-- skip user if not available
+    });
+
     await comment.save();
 
     res.status(201).json({
@@ -12,9 +24,11 @@ module.exports.addComment = async (req, res) => {
       comment,
     });
   } catch (error) {
+    console.error("Add comment error:", error); // <--- log the real error
     res.status(500).json({ error: "Server error while adding comment" });
   }
 };
+
 
 // Get comments by video ID
 module.exports.getCommentsByVideoId = async (req, res) => {
