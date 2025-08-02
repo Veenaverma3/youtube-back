@@ -5,13 +5,13 @@
   try {
     const { video, message ,userId } = req.body;
 
-        if (!video || !message || !userId) {
+        if (!video || !message) {
       return res.status(400).json({ error: "Missing required fields" });
     }
 
 
     const comment = new Comment({
-      user: userId,
+      user: userId || null,
       video,
       message,
       // user: req.user?._id  <-- skip user if not available

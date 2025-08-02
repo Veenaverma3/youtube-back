@@ -4,7 +4,8 @@ const commentSchema = new mongoose.Schema({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
-        required: true,
+        required: false,
+        default: null, // allow user to be optional
     },
     video: {
         type: mongoose.Schema.Types.ObjectId,
