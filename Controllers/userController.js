@@ -25,7 +25,7 @@ exports.signUp = async (req, res) => {
       userName,
       password: hashedPassword,
       about,
-      profilePic,
+  profilePic: profilePic || "https://i.ibb.co/YcJwV1Z/default-profile.png",
     });
 
     await user.save();
