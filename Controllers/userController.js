@@ -92,8 +92,9 @@ exports.logout = async (req, res) => {
 // ───────────── Get Current User ─────────────
  exports.getCurrentUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user._id).select("-password");
+    const user = await User.findById(req.user.userId).select("-password");
     res.status(200).json({ user });
+    console.log("req.user:", req.user);
   } catch (error) {
     console.error("getCurrentUser error:", error);
     res.status(500).json({ message: "Error getting user" });
