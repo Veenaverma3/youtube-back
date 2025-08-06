@@ -9,6 +9,8 @@ const app = express();
 
 // Constants
  const CLIENT_URL = 'https://youtube-fron.vercel.app';
+//  const CLIENT_URL = 'http://localhost:3000';
+
 // Middleware
  app.use(cors({
   origin: CLIENT_URL,

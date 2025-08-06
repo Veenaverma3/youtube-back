@@ -5,8 +5,8 @@ require("dotenv").config();
 
 const cookieOptions = {
   httpOnly: true,
-  secure: false, // set to true in production (HTTPS)
-  sameSite: "Lax",
+  secure: true, // set to true in production (HTTPS)
+  sameSite: "none",
   maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
 };
 // ───────────── Signup ─────────────
@@ -20,7 +20,7 @@ exports.signUp = async (req, res) => {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({
+    const newUser = new User({
       channelName,
       userName,
       password: hashedPassword,
@@ -28,21 +28,22 @@ exports.signUp = async (req, res) => {
   profilePic: profilePic || "https://i.ibb.co/YcJwV1Z/default-profile.png",
     });
 
-    await user.save();
-    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+    await newUser.save();
+    const token = jwt.sign({ userId: newUser._id }, process.env.JWT_SECRET, {
       expiresIn: "90d",
     });
-       res.cookie("token", token, cookieOptions);
+
+    res.cookie("token", token, cookieOptions);
 
     res.status(201).json({
-      message: "User registered successfully",
+      message: "signup successful",
       success: true,
       token,
       user: {
-        _id: user._id,
-        userName: user.userName,
-        channelName: user.channelName,
-        profilePic: user.profilePic,
+        _id: newUser._id,
+        userName:  newUser.userName,
+        channelName:  newUser.channelName,
+        profilePic:  newUser.profilePic,
       },
     });
   } catch (error) {
