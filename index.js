@@ -9,10 +9,10 @@ const app = express();
 
 // Constants
  const CLIENT_URL = 'https://youtube-fron.vercel.app';
-//  const CLIENT_URL = 'http://localhost:3000';
+// const CLIENT_URL = 'http://localhost:3000';
 
 // Middleware
- app.use(cors({
+app.use(cors({
   origin: CLIENT_URL,
   credentials: true,
   }));
@@ -30,6 +30,7 @@ const CommentRoutes = require('./Routes/comment');
 app.use('/api', VideoRoutes);
 app.use('/auth', AuthRoutes);
 app.use('/commentapi', CommentRoutes);
+
 app.use('/', (req, res) => {
   res.send('Welcome to the YouTube Clone API'); 
 });
@@ -39,4 +40,3 @@ const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`🚀 Server is running on port http://localhost:${port}`);
 });
- 
