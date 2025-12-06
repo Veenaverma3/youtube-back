@@ -32,7 +32,7 @@ app.use('/auth', AuthRoutes);
 app.use('/commentapi', CommentRoutes);
 
 app.use('/', (req, res) => {
-  res.send('Welcome to the YouTube Clone API'); 
+  res.send('Welcome to my YouTube Clone API'); 
 });
 
 const port = process.env.PORT;
